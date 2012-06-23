@@ -3,7 +3,7 @@
 // @description    Allows you to simulate combat before actually attacking.
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx* 
 // @include        https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
-// @version        1.3.0.4
+// @version        1.3.1.0
 // @author         WildKatana
 // @require        http://sizzlemctwizzle.com/updater.php?id=130344&days=1
 // ==/UserScript==
@@ -16,10 +16,62 @@
           extend: qx.core.Object,
           members: {
             buttonSimulateCombat: null,
+            buttonLayoutSave: null,
+            buttonLayoutLoad: null,
             buttonReturnSetup: null,
+            
+            add_ViewModeChange: null,
+            
             attacker_modules: null,
             defender_modules: null,
+            
+            lastPercentage: null,
+            lastRepairTime: null,
+            lastEnemyPercentage: null,
+            lastDFPercentage: null,
+            lastCYPercentage: null,
+            lastInfantryPercentage: null,
+            lastVehiclePercentage: null,
+            lastAirPercentage: null,
+            lastEnemyUnitsPercentage: null,
+            lastEnemyBuildingsPercentage: null,
+            lastVictory: null,
+            lastInfantryRepairTime: null,
+            lastVehicleRepairTime: null,
+            lastAircraftRepairTime: null,
+            totalSeconds: null,
+            
+            tiberiumSpoils: null,
+            crystalSpoils: null,
+            creditSpoils: null,
+            researchSpoils: null,
+            
+            units: null,
+            units_list: null,
+            saved_units: null,
+            layoutsList: null,
+            layoutsLabelText: null,
+            
+            battleResultsBox: null,
+            
+            troopDamageLabel: null,
+            enemyTroopStrengthLabel: null,
+            enemyBuildingsStrengthLabel: null,
+            enemyUnitsStrengthLabel: null,
+            airTroopStrengthLabel: null,
+            infantryTroopStrengthLabel: null,
+            vehicleTroopStrengthLabel: null,
+            CYTroopStrengthLabel: null,
+            DFTroopStrengthLabel: null,
+            simTroopDamageLabel: null,
+            simRepairTimeLabel: null,
+            simVictoryLabel: null,
+            simTimeLabel: null,
+            enemySupportLevelLabel: null,
+            enemySupportStrengthLabel: null,
+            
             initialize: function () {
+              this.add_ViewModeChange = (new ClientLib.Vis.ViewModeChange).HGL(this, this.onViewChange);
               this.buttonSimulateCombat = new qx.ui.form.Button("Simulate");
               this.buttonSimulateCombat.set({
                 width: 80,
@@ -67,6 +119,7 @@
                   }
 
                   _this.defender_modules = _this.attacker_modules;
+                  ClientLib.Vis.VisMain.GetInstance().add_ViewModeChange(_this.add_ViewModeChange);
                 } catch (e) {
                   console.log(e);
                 }
@@ -77,6 +130,21 @@
                 top: 130,
                 right: 0
               });
+            },
+            onViewChange: function (oldMode, newMode) {
+              console.log(oldMode);
+              console.log(newMode);
+              try {
+                if (oldMode == webfrontend.gui.PlayArea.PlayArea.modes.EMode_CombatSetupDefense && newMode == webfrontend.gui.PlayArea.PlayArea.modes.EMode_PlayerOffense) {
+                  // TODO - Switched from Combat Setup to the Simulation, show the stats box
+                  
+                }
+                else {
+                  // TODO - Close the stats box
+                }
+              } catch (e) {
+                console.log(e);
+              }
             },
             returnSetup: function () {
               // Set the scene again, just in case it didn't work the first time
@@ -113,7 +181,7 @@
 
                 for (var i = 0; i < unitData.length; i++) {
                   var info = new Object();
-                  info.h = unitData[i].get_Health() - unitData[i].get_CurrentDamage();
+                  info.h = unitData[i].get_Health();
                   info.i = unitData[i].get_MdbUnitId();
                   info.l = unitData[i].get_CurrentLevel();
                   info.x = offense_units[i].get_CoordX();
@@ -127,7 +195,7 @@
                 data = new Array();
                 for (i = 0; i < unitData.length; i++) {
                   info = new Object();
-                  info.h = unitData[i].get_Health() - unitData[i].get_CurrentDamage();
+                  info.h = unitData[i].get_Health();
                   info.i = unitData[i].get_MdbUnitId();
                   info.l = unitData[i].get_CurrentLevel();
                   info.x = unitData[i].get_CoordX();
@@ -174,7 +242,7 @@
                 data = new Array();
                 for (i = 0; i < unitData.length; i++) {
                   info = new Object();
-                  info.h = unitData[i].get_Health() - unitData[i].get_CurrentDamage();
+                  info.h = unitData[i].get_Health();
                   info.i = unitData[i].get_MdbUnitId();
                   info.l = unitData[i].get_CurrentLevel();
                   info.x = unitData[i].get_CoordX();
@@ -185,12 +253,12 @@
                 combatData.WN = data; // Buildings
 
                 combatData.XN = null; // Support Structures
-                combatData.SN = 8696244; // Start Step
+                combatData.SN = 8696244; // Start Step - this is just a random number
                 combatData.m_CombatSteps = 1;
                 combatData.m_BoostInfantry = alliance.get_POIInfantryBonus();
                 combatData.m_BoostVehicle = alliance.get_POIVehicleBonus();
                 combatData.m_BoostAir = alliance.get_POIAirBonus();
-                combatData.m_BoostDefense = current_city.m_AllianceDefenseBonus ? current_city.m_AllianceDefenseBonus : 0;
+                combatData.m_BoostDefense = current_city.m_AllianceDefenseBonus ? current_city.m_AllianceDefenseBonus : 0; // This might not be working
                 combatData.m_AttackerBaseId = own_city.get_Id();
                 combatData.m_AttackerBaseName = own_city.get_Name();
                 combatData.m_AttackerPlayerId = own_city.get_PlayerId();
