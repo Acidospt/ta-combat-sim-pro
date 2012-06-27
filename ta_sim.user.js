@@ -296,9 +296,9 @@
               this.battleResultsBox.add(vBox);
             },
             onDamageDone: function (sender, e) {
-              battleground = sender.DamageDone.i[0].o;
+              battleground = sender.AQL.i[0].o; // DamageDone was renamed to AQL
               // For the sake of performance, only run this every 10th step
-              if (battleground.m_CurrentStep % 10 == 0) {
+              if (battleground.BZF % 10 == 0) { // m_CurrentStep changed to BZF
                 window.TASuite.main.getInstance().calculateTroopStrengths(battleground);
                 window.TASuite.main.getInstance().updateBattleResultsWindow();
               }
@@ -330,11 +330,10 @@
               var own_city = ClientLib.Data.MainData.GetInstance().get_Cities().get_CurrentOwnCity();
               var crd = own_city.get_CityRepairData();
               var cud = own_city.get_CityUnitsData();
+              var repair_times = own_city.get_CityUnitsData().ZHG.d; // m_FullRawRepairTimeForUnitGroupTypes renamed to ZHG
               var r_types = ClientLib.Base.EResourceType;
               
               var entities = battleground.OAG.d; // m_Entities has been renamed to OAG
-              
-              console.log(entities);
               
               for (var i in entities) {
                 var entity = entities[i];
@@ -346,7 +345,7 @@
                   // This is one of the good guys
                   end_hp += current_hp;
                   total_hp += max_hp;
-                  switch (a_entity.XIJ) { // MJJ is the movement type
+                  switch (a_entity.XIJ) { // XIJ is the movement type
                     case ClientLib.Base.EUnitMovementType.Air:
                     case ClientLib.Base.EUnitMovementType.Air2:
                       a_end_hp += current_hp;
@@ -412,14 +411,13 @@
               this.lastEnemyBuildingsPercentage = (eb_end_hp / eb_total_hp) * 100;
               this.lastEnemyPercentage = (e_end_hp / e_total_hp) * 100;
               this.lastPercentage = (end_hp / total_hp) * 100;
-
-              // Calculate the repair time
-              this.lastInfantryRepairTime = crd.XWI(r_types.RepairChargeInf, cud.GetRepairTimeFromEUnitGroup([ClientLib.Data.EUnitGroup.Infantry]), (1 - this.lastInfantryPercentage / 100)); // FIXME - ConvertRepairCost has been renamed to XWI or YWI
-              this.lastAircraftRepairTime = crd.XWI(r_types.RepairChargeAir, cud.GetRepairTimeFromEUnitGroup([ClientLib.Data.EUnitGroup.Aircraft]), (1 - this.lastAirPercentage / 100));
-              this.lastVehicleRepairTime = crd.XWI(r_types.RepairChargeVeh, cud.GetRepairTimeFromEUnitGroup([ClientLib.Data.EUnitGroup.Vehicle]), (1 - this.lastVehiclePercentage / 100));
-              this.lastRepairTime = Math.max(this.lastVehicleRepairTime, this.lastAircraftRepairTime, this.lastInfantryRepairTime);
               
-              console.log(this);
+              // Calculate the repair time
+              crd.ConvertRepairCost = crd.XWI;// ConvertRepairCost has been renamed to XWI
+              this.lastInfantryRepairTime = crd.ConvertRepairCost(r_types.RepairChargeInf, repair_times[ClientLib.Data.EUnitGroup.Infantry], (1 - this.lastInfantryPercentage / 100));
+              this.lastAircraftRepairTime = crd.ConvertRepairCost(r_types.RepairChargeAir, repair_times[ClientLib.Data.EUnitGroup.Aircraft], (1 - this.lastAirPercentage / 100));
+              this.lastVehicleRepairTime = crd.ConvertRepairCost(r_types.RepairChargeVeh, repair_times[ClientLib.Data.EUnitGroup.Vehicle], (1 - this.lastVehiclePercentage / 100));
+              this.lastRepairTime = Math.max(this.lastVehicleRepairTime, this.lastAircraftRepairTime, this.lastInfantryRepairTime);
             },
             setLabelColor: function (obj, val, dir) {
               var colors = ['black', 'blue', 'green', 'red'];
@@ -520,11 +518,12 @@
             onViewChange: function (oldMode, newMode) {
               try {
                 if (oldMode == webfrontend.gui.PlayArea.PlayArea.modes.EMode_CombatSetupDefense && newMode == webfrontend.gui.PlayArea.PlayArea.modes.EMode_PlayerOffense) {
+                  // Actually we are doing this when we press the Simulate button instead for now
                   // Switched from Combat Setup to the Simulation, show the stats box
-                  this.battleResultsBox.open();
-                  var battleground = ClientLib.Vis.VisMain.GetInstance().get_Battleground();
-                  this.calculateTroopStrengths(battleground);
-                  this.updateBattleResultsWindow();
+                  //this.battleResultsBox.open();
+                  //var battleground = ClientLib.Vis.VisMain.GetInstance().get_Battleground();
+                  //this.calculateTroopStrengths(battleground);
+                  //this.updateBattleResultsWindow();
                 }
                 else {
                   // Close the stats box
@@ -559,11 +558,11 @@
                 localStorage.ta_sim_last_city = current_city.get_Id();
 
                 var alliance = ClientLib.Data.MainData.GetInstance().get_Alliance();
-                var combatData = (new $I.CM).$ctor();
+                var combatData = (new ClientLib.Data.Combat).$ctor();
                 //var combatData = (new $I.CM).QB();
                 combatData.RN = 1; // Version
                 
-                var unitData = own_city.get_CityUnitsData().HIG.l;
+                var unitData = own_city.get_CityUnitsData().QGG().l;
                 var offense_units = own_city.get_CityArmyFormationsManager().GetFormationByTargetBaseId(current_city.get_Id()).get_ArmyUnits().l;
                 var data = new Array();
 
@@ -705,7 +704,7 @@
                 var battleground = this.setupBattleground();
                 
                 // Add the event listeners
-                // battleground.m_Simulation.add_DamageDone$0((new System.EventHandler).$ctor(this, this.onDamageDone)); // FIXME - The add_DamageDone$0 has been renamed, and so has the System.EventHandler...
+                battleground.MAG.TOL((new $I.QQL).HGL(this, this.onDamageDone)); // m_Simulation became MAG, The add_DamageDone$0 has been renamed to TOL, System.EventHandler.$ctor was renamed to $I.QQL.HGL
 
                 // Set the scene again, just in case it didn't work the first time
                 try {
@@ -713,6 +712,10 @@
                 } catch (e) {
                   app.getPlayArea().setView(webfrontend.gui.PlayArea.modes.EMode_CombatReplay, current_city.get_Id(), 0, 0);
                 }
+                
+                this.battleResultsBox.open();
+                this.calculateTroopStrengths(battleground);
+                this.updateBattleResultsWindow();
               } catch (e) {
                 console.log(e);
               }
