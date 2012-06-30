@@ -3,7 +3,7 @@
 // @description    Allows you to simulate combat before actually attacking.
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx* 
 // @include        https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
-// @version        1.3.1.0
+// @version        1.3.2.1
 // @author         WildKatana
 // @require        http://sizzlemctwizzle.com/updater.php?id=130344&days=1
 // ==/UserScript==
@@ -21,6 +21,7 @@
             buttonReturnSetup: null,
             buttonUnlockAttack: null,
             buttonTools: null,
+            busy: null,
             
             add_ViewModeChange: null,
             add_ArmyChanged: null,
@@ -119,6 +120,8 @@
                 toolTipText: "Open Simulator Tools"
               });
               this.buttonTools.addListener("click", this.toggleTools, this);
+              
+              busy = false;
 
               _this = this;
               setTimeout(function () {
@@ -441,6 +444,7 @@
               else {
                 // Add the event listener for armybar
                 try {
+                  units.remove_ArmyChanged(this.add_ArmyChanged);
                   units.add_ArmyChanged(this.add_ArmyChanged);
                 } catch (e) {
                   console.log(e);
@@ -502,7 +506,7 @@
               this.tiberiumSpoils.setLabel(this.formatNumberWithCommas(spoils[1]));
               this.crystalSpoils.setLabel(this.formatNumberWithCommas(spoils[2]));
               this.creditSpoils.setLabel(this.formatNumberWithCommas(spoils[3]));
-              this.researchSpoils.setLabel(this.formatNumberWithCommas(spoils[7]));
+              this.researchSpoils.setLabel(this.formatNumberWithCommas(spoils[6]));
             },
             calculateSimResults: function () {
               var battleground = this.setupBattleground(this.getCityPreArmyUnits());
@@ -513,9 +517,11 @@
               this.calculateTroopStrengths(battleground);
             },
             onUnitMoved: function (sender, e) {
-              var ta = window.TASuite.main.getInstance();
-              ta.calculateSimResults();
-              ta.updateStatsWindow();
+              if (!busy) {
+                var ta = window.TASuite.main.getInstance();
+                ta.calculateSimResults();
+                ta.updateStatsWindow();
+              }
             },
             onDamageDone: function (sender, e) {
               var ta = window.TASuite.main.getInstance();
@@ -750,7 +756,7 @@
                 }
                 else {
                   // Close the stats box
-                  //this.battleResultsBox.close();
+                  this.battleResultsBox.close();
                 }
               } catch (e) {
                 console.log(e);
@@ -786,7 +792,12 @@
                 combatData.RN = 1; // Version
                 
                 var unitData = own_city.get_CityUnitsData().QGG().l;
-                offense_units = offense_units.LJG.l || own_city.get_CityArmyFormationsManager().GetFormationByTargetBaseId(current_city.get_Id()).get_ArmyUnits().l;
+                if (offense_units) {
+                  offense_units = offense_units.LJG.l;
+                }
+                else {
+                  offense_units = own_city.get_CityArmyFormationsManager().GetFormationByTargetBaseId(current_city.get_Id()).get_ArmyUnits().l;
+                }
                 var data = new Array();
 
                 for (var i = 0; i < unitData.length; i++) {
@@ -936,9 +947,7 @@
                   app.getPlayArea().setView(webfrontend.gui.PlayArea.modes.EMode_CombatReplay, current_city.get_Id(), 0, 0);
                 }
                 
-                this.battleResultsBox.open();
-                this.calculateTroopStrengths(battleground);
-                this.updateStatsWindow();
+                this.battleResultsBox.close();
               } catch (e) {
                 console.log(e);
               }
