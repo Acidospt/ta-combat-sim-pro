@@ -94,7 +94,7 @@
               var replayBar = qx.core.Init.getApplication().getReportReplayOverlay();
               replayBar.add(this.buttonReturnSetup, {
                 top: 10,
-                right: 80
+                left: 0
               });
               
               var armyBar = qx.core.Init.getApplication().getUIItem(ClientLib.Data.Missions.PATH.BAR_ATTACKSETUP);
@@ -109,7 +109,7 @@
               this.buttonUnlockAttack.addListener("click", this.unlockAttacks, this);
               this.buttonUnlockAttack.setOpacity(0.5);
               armyBar.add(this.buttonUnlockAttack, {
-                top: 81,
+                top: 103,
                 right: 0
               });
               
@@ -171,12 +171,12 @@
                   ClientLib.Vis.VisMain.GetInstance().add_ViewModeChange(_this.add_ViewModeChange);
                   
                   armyBar.add(_this.buttonTools, {
-                    top: 17,
-                    right: 0
+                    top: 20,
+                    left: 0
                   });
                   armyBar.add(_this.buttonSimulateCombat, {
-                    top: 130,
-                    right: 0
+                    top: 50,
+                    left: 0
                   });
                 } catch (e) {
                   console.log(e);
@@ -440,7 +440,7 @@
               this.units = units.get_ArmyUnits().l;
               if (this.battleResultsBox.isVisible()) {
                 this.closeToolsBox();
-              } 
+              }
               else {
                 // Add the event listener for armybar
                 try {
@@ -462,7 +462,7 @@
               var units = null;
               for (var key in armyBar) {
                 try {
-                  if (armyBar[key] instanceof ClientLib.Data.CityPreArmyUnits) { // ClientLib.Data.CityPreArmyUnits renamed to $I.UIG
+                  if (armyBar[key] instanceof ClientLib.Data.CityPreArmyUnits) { // ClientLib.Data.CityPreArmyUnits renamed to $I.UIG  = $I.NSVPME *CHECKED*
                     units = armyBar[key];
                     break;
                   }
@@ -476,7 +476,7 @@
             calculateLoot: function () {
               // Adapted from the CNC Loot script: http://userscripts.org/scripts/show/135953
               var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_CurrentCity();
-              var num = city.get_CityBuildingsData().BEI(); // FIXME m_BuildSlotsCurrent renamed to BEI()
+              var num = city.get_CityBuildingsData().RVQBJT(); // m_BuildSlotsCurrent renamed to RVQBJT()
               var spoils = {
                 1: 0,
                 2: 0,
@@ -486,20 +486,20 @@
               };
 
               for (var j = num; --j >= 0;) {
-                var building = city.get_CityBuildingsData().TDI().l[j]; // FIXME m_Buildings renamed to TDI()
-                var mod = building.PWG / building.SWG; // FIXME m_CurrentHealth renamed to PWG, m_MaxHealth renamed to SWG
-                for (var i = building.KWG.rer.length; --i >= 0;) { // FIXME m_UnitLevelRequirements renamed to KWG
-                  spoils[building.KWG.rer[i].t] += mod * building.KWG.rer[i].c;
+                var building = city.get_CityBuildingsData().RSRTMA().l[j]; //m_Buildings renamed to RSRTMA()
+                var mod = building.NRCJKK / building.UBEEJD; //m_CurrentHealth renamed to NRCJKK, m_MaxHealth renamed to UBEEJD
+                for (var i = building.RBGTWS.rer.length; --i >= 0;) { //m_UnitLevelRequirements renamed to RBGTWS
+                  spoils[building.RBGTWS.rer[i].t] += mod * building.RBGTWS.rer[i].c;
                 }
               }
 
-              if (city.get_CityUnitsData().XI != null) { // FIXME m_DefenseUnits renamed to XI
-                num = city.get_CityUnitsData().XI.l.length;
+              if (city.get_CityUnitsData().SNVBHX != null) { // m_DefenseUnits renamed to SNVBHX
+                num = city.get_CityUnitsData().SNVBHX.l.length;
                 for (j = num; --j >= 0;) {
-                  var unit = city.get_CityUnitsData().XI.l[j];
-                  mod = unit.PWG / unit.SWG;
-                  for (i = unit.KWG.rer.length; --i >= 0;) {
-                    spoils[unit.KWG.rer[i].t] += mod * unit.KWG.rer[i].c;
+                  var unit = city.get_CityUnitsData().SNVBHX.l[j];
+                  mod = unit.NRCJKK / unit.UBEEJD;
+                  for (i = unit.RBGTWS.rer.length; --i >= 0;) {
+                    spoils[unit.RBGTWS.rer[i].t] += mod * unit.RBGTWS.rer[i].c;
                   }
                 }
               }
@@ -512,7 +512,7 @@
               var battleground = this.setupBattleground(this.getCityPreArmyUnits());
               
               // Run the simulation until it's done
-              while (battleground.MAG.DPL(false)) {} // FIXME DoStep$0 was renamed to DPL, m_Simulation was renamed to MAG
+              while (battleground.HXGRQD.ICPGRO(false)) {} // DoStep$0 was renamed to ICPGRO, m_Simulation was renamed to HXGRQD
               
               this.calculateTroopStrengths(battleground);
             },
@@ -527,7 +527,7 @@
               var ta = window.TASuite.main.getInstance();
               battleground = sender.GETXBE.i[0].o; // DamageDone was renamed to GETXBE
               // For the sake of performance, only run this every 10th step
-              if (battleground.LTUPDH  % 10 == 0) { // m_CurrentStep changed to LTUPDH 
+              if (battleground.LTUPDH % 10 == 0) { // m_CurrentStep changed to LTUPDH
                 ta.calculateTroopStrengths(battleground);
                 ta.updateStatsWindow();
               }
@@ -570,7 +570,7 @@
                 var a_entity = entity.CMCLEW; // ??? has been renamed to CMCLEW
                 var current_hp = i_entity.XKHWEF; // m_iHitpointsCurrent has been renamed to XKHWEF
                 var max_hp = i_entity.WCJQEN; // m_iHitpoints has been renamed to WCJQEN
-                if (a_entity.PSVMGQ  == 2) { // ??? has been renamed to PSVMGQ, Attacker is 2
+                if (a_entity.PSVMGQ == 2) { // ??? has been renamed to PSVMGQ, Attacker is 2
                   // This is one of the good guys
                   end_hp += current_hp;
                   total_hp += max_hp;
@@ -592,7 +592,7 @@
                     case ClientLib.Base.EUnitMovementType.Structure:
                       break;
                   }
-                } 
+                }
                 else {
                   // Enemy Overall
                   e_total_hp += max_hp;
@@ -694,7 +694,7 @@
               var SLabel = (this.SupportLevel > 0) ? this.SupportLevel.toString() : '--';
               this.enemySupportLevelLabel.setValue('Suport lvl ' + SLabel + ': ');
               this.updateLabel100(this.enemySupportStrengthLabel, this.lastSupportPercentage, -1);
-              // ATTACKER 
+              // ATTACKER
               this.setLabelColor(this.simRepairTimeLabel, this.lastRepairTime / 14400.0, -1); //max is 4h
               this.simRepairTimeLabel.setValue(this.formatSecondsAsTime(this.lastRepairTime, "h:mm:ss"));
               // OVERALL
@@ -792,7 +792,7 @@
                 
                 var unitData = own_city.get_CityUnitsData().HHYWQM().l; // Attacker Units renamed to HHYWQM
                 if (offense_units) {
-                  offense_units = offense_units.LJG.l; // FIXME
+                  offense_units = offense_units.PFTXHT.l;
                 }
                 else {
                   offense_units = own_city.get_CityArmyFormationsManager().GetFormationByTargetBaseId(current_city.get_Id()).get_ArmyUnits().l;
@@ -800,13 +800,15 @@
                 var data = new Array();
 
                 for (var i = 0; i < unitData.length; i++) {
-                  var info = new Object();
-                  info.h = unitData[i].get_Health();
-                  info.i = unitData[i].get_MdbUnitId();
-                  info.l = unitData[i].get_CurrentLevel();
-                  info.x = offense_units[i].get_CoordX();
-                  info.y = offense_units[i].get_CoordY();
-                  data.push(info);
+          if (offense_units[i].get_Enabled()) {
+            var info = new Object();
+            info.h = unitData[i].get_Health();
+            info.i = unitData[i].get_MdbUnitId();
+            info.l = unitData[i].get_CurrentLevel();
+            info.x = offense_units[i].get_CoordX();
+            info.y = offense_units[i].get_CoordY();
+            data.push(info);
+          }
                 }
 
                 combatData.VVWJIF = data; // Attackers renamed to VVWJIF
@@ -1053,11 +1055,11 @@
                 var saved_unit = saved_units[i];
                 units_list[i].set_CoordX(saved_unit.x);
                 units_list[i].set_CoordY(saved_unit.y);
-                units_list[i].SFB = saved_unit.id; // FIXME - m_UnitId renamed to SFB
+                units_list[i].BZZGTH = saved_unit.id; // m_UnitId renamed to BZZGTH
               }
 
-              units.DJG(); // FIXME - UpdateArmyLayout$0() has been renamed to DJG()
-              units.BJG(); // FIXME - RefreshData() has been renamed to BJG()
+              units.TNEWNF(); // UpdateArmyLayout$0() has been renamed to TNEWNF()
+              units.AOMXAS(); // RefreshData() has been renamed to AOMXAS()
             },
             saveFormation: function () {
               this.saved_units = [];
